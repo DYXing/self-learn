@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="300">
+    <properties>
+        <!--"LOG_HOME"修改日志文件的输出路径，项目根目录为src所在目录，"FILE_NAME"修改输出日志文件名-->
+        <property name="LOG_HOME">/data/logs/self-learn/</property>
+        <property name="FILE_NAME">self-learn.log</property>
+        <property name="FILE_LOG_PATTERN"
+                  value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-5level][%M %C:%L][%X{X-B3-TraceId},%X{X-B3-SpanId}] %m%n"/>
+    </properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+        </Console>
+        <File name="ERROR" fileName="${LOG_HOME}/error.log" append="false">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+        </File>
+        <RollingRandomAccessFile name="RollingFile"
+                                 fileName="${LOG_HOME}/${FILE_NAME}"
+                                 filePattern="${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <!--基于时间触发生成日志文件，此处1天保存一次，最小保存单元与filePattern的文件名格式有关-->
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+                <!--基于容量触发生成日志文件，此处100MB保存一次-->
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+            <!--最大保存日志文件个数-->
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="ERROR"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
